@@ -1,0 +1,207 @@
+﻿@model DoanhThuNhanVienLuotModel
+@using Nop.Web.Models.NhaXeBaoCao
+@using Nop.Core.Domain.NhaXes
+@using Nop.Core.Infrastructure
+@{
+
+    Layout = "~/Views/Shared/_NhaXeLayout.cshtml";
+    
+    var titlepage = "Chấm công nhân viên";
+}
+<div class="section-header">
+    <div class="title">
+        <img src="@Url.Content("~/Content/chonve/nxmenu/baocaodoanhthu.png")" alt="" />
+        @titlepage
+    </div>
+    <div class="options">
+        <input type="button" id="btnexportdoanhthu" class="k-button" value="Xuất ra excel" />
+
+    </div>
+</div>
+<table style="width:100%">
+    <tr>
+        <td align="center" width="15%">
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @T("chonve.menu.nhaxe.baocao.ListLoai"):
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.Loai1Id, Model.ListLoai1)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td align="center" width="15%" id="tabThang">
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @T("common.month"):
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.ThangId, Model.ListMonth)
+                    </td>
+                </tr>
+            </table>
+        </td>        
+        <td align="center" width="15%" id="tabNam">
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @T("common.year"):
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.NamId, Model.ListYear)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td align="center" width="15%" >
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        Tìm nhân viên:
+                    </td>
+                    <td class="adminData">
+                       @Html.EditorFor(model => model.SearchName)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td align="center" >
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @T("chonve.menu.nhaxe.baocao.ListLoai"):
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.Loai2Id, Model.ListLoai2)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="text-align:right">
+            <input type="button" id="btnSearch" class="k-button" value="@T("Admin.Common.Search")" />
+        </td>
+    </tr>
+</table>
+@using (Html.BeginForm("ExportExcelDoanhThuTuyen", "NhaXeBaoCao", FormMethod.Post, new { id = "export-xml-selected-form" }))
+{
+
+
+    <input type="hidden" id="ThangId" name="ThangId" value="" />
+    <input type="hidden" id="NamId" name="NamId" value="" />
+    <input type="hidden" id="Loai1Id" name="Loai1Id" value="" />
+    <input type="hidden" id="Loai2Id" name="Loai2Id" value="" />
+    <input type="hidden" id="SearchName" name="SearchName" value="" />
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#btnexportdoanhthu').click(function () {
+
+            var ThangId = $('#@Html.FieldIdFor(m => m.ThangId)').val();
+            var NamId = $('#@Html.FieldIdFor(m => m.NamId)').val();
+            var Loai1Id = $('#@Html.FieldIdFor(m => m.Loai1Id)').val();
+            var Loai2Id = $('#@Html.FieldIdFor(m => m.Loai2Id)').val();
+            var SearchName = $('#@Html.FieldIdFor(m => m.SearchName)').val();
+
+
+            $('#export-xml-selected-form #ThangId').val(ThangId);
+            $('#export-xml-selected-form #NamId').val(NamId);
+            $('#export-xml-selected-form #Loai1Id').val(Loai1Id);
+            $('#export-xml-selected-form #Loai2Id').val(Loai2Id);
+            $('#export-xml-selected-form #SearchName').val(SearchName);
+            $('#export-xml-selected-form').submit();
+            return false;
+        });
+    });
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        $("#tabQuy").hide();
+        LoadBangDoanhThuNhanVienLuot();
+
+        $('#btnSearch').click(function () {
+            //search
+            LoadBangDoanhThuNhanVienLuot();
+        });
+        $("#@Html.FieldIdFor(model => model.Loai1Id)").change(function () {
+            switch ($(this[this.selectedIndex]).val()) {
+                case "@((int)ENBaoCaoChuKyThoiGian.HangThang)":
+                    {
+                        $("#tabThang").hide();
+                        $("#tabNam").show();
+                        break;
+                    }
+                case "@((int)ENBaoCaoChuKyThoiGian.HangNam)":
+                    {
+                        $("#tabThang").hide();
+                        $("#tabNam").hide();
+                        break;
+                    }
+                case "@((int)ENBaoCaoChuKyThoiGian.HangNgay)":
+                    {
+                        $("#tabThang").show();
+                        $("#tabNam").show();
+                        break;
+                    }
+            }
+            $("#btnSearch").click();
+        });
+        $("#@Html.FieldIdFor(model => model.NamId)").change(function () {
+            $("#btnSearch").click();
+        });
+        $("#@Html.FieldIdFor(model => model.ThangId)").change(function () {
+            $("#btnSearch").click();
+        });
+        $("#@Html.FieldIdFor(model => model.Loai2Id)").change(function () {
+            $("#btnSearch").click();
+        });
+    });
+    function LoadBangDoanhThuNhanVienLuot() {
+        var ThangId = $('#@Html.FieldIdFor(m => m.ThangId)').val();
+        var NamId = $('#@Html.FieldIdFor(m => m.NamId)').val();
+        var Loai1Id = $('#@Html.FieldIdFor(m => m.Loai1Id)').val();
+        var Loai2Id = $('#@Html.FieldIdFor(m => m.Loai2Id)').val();
+        var SearchName = $('#@Html.FieldIdFor(m => m.SearchName)').val();
+
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            contentType: 'application/html;charset=utf-8',
+            data: { "ThangId": ThangId, "NamId": NamId, "Loai1Id": Loai1Id, "Loai2Id": Loai2Id, "SearchName": SearchName },
+            url: "@(Url.Action("_GetChamCongNhanVien", "NhaXeBaoCao"))",
+            success: function (data) {
+
+                if (data != null) {
+                    $("#BangDoanhThuLuot").html(data);
+                }
+                else {
+                    $("#BangDoanhThuLuot").html("<p>Không có quyền báo vé</p>")
+                }
+
+            },
+            error: function (xhr, ajaxOptions, thrownError) {
+                alert('Chưa đủ thông tin');
+            }
+        });
+    }
+</script>
+<div id="BangDoanhThuLuot" style="overflow-x: scroll; overflow-y: scroll;height:500px">
+</div>
+
+
+
+
+<style>
+    .footerTemplateBaoCao {
+        text-align: right;
+        font-size: 16px;
+        color: #1a3410;
+    }
+</style>

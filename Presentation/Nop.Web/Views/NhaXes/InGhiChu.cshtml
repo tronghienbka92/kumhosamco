@@ -1,0 +1,34 @@
+﻿@model Nop.Web.Models.NhaXes.NhanVienModel
+@{
+    Layout = null;
+}
+@Html.HiddenFor(c=>c.Id)
+<table width="100%">
+    <tr>
+        <td colspan="2" style="text-align:center">GHI CHÚ CHO NHÂN VIÊN</td>
+    </tr>
+   
+    <tr>
+        <td>
+            <table width="40%">
+                <tr>
+                    <td>Tên nhân viên:</td>
+                    <td>@Model.HoVaTen</td>
+                </tr>
+                <tr>
+                    <td>Số điện thoại:</td>
+                    <td>@Model.DienThoai</td>
+                </tr>
+                
+            </table>
+        </td>
+        
+    </tr>
+    <tr>
+        <td colspan="2">
+            @Html.Raw(Model.GhiChu)
+        </td>
+    </tr>
+</table>
+
+

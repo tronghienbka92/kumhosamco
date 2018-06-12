@@ -1,0 +1,45 @@
+﻿
+@model DaiLyModel
+@using Nop.Web.Models.NhaXes
+@using Nop.Core.Infrastructure
+@using Nop.Web.Framework.Events
+@using Nop.Services.Events
+
+
+<div id="modeldetail-edit">
+    <ul>
+        <li @Html.RenderSelectedTabIndex(0, GetSelectedTabIndex())>
+            @T("ChonVe.NhaXe.TabThongTin")
+        </li>
+    </ul>
+    <div>
+        @TabInfo()
+    </div>
+</div>
+
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "modeldetail-edit");
+    EngineContext.Current.Resolve<IEventPublisher>().Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}
+
+@*save selected tab index*@
+<input type="hidden" id="selected-tab-index" name="selected-tab-index" value="@(GetSelectedTabIndex())">
+@helper TabInfo()
+{
+    <table class="adminContent">
+        <tr>
+            <td class="adminTitle">
+                Tên đại lý:
+            </td>
+            <td class="adminData">
+                @Html.EditorFor(model => model.TenDaiLy)
+            </td>
+        </tr>            
+    </table>
+}
+

@@ -1,0 +1,99 @@
+﻿@model Nop.Web.Models.NhaXes.HanhTrinhGiaVeThoiGianModel
+<table style="width:100%">
+    <tr>
+        <td class="adminTitle">
+            Điểm đi:
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model=>model.DiemDiId,Model.DiemDis)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            Điểm đón:
+        </td>
+        <td class="adminData">
+            @Html.DropDownListFor(model => model.DiemDenId, Model.DiemDens)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            Từ ngày:
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.TuNgay)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            Đến ngày:
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.DenNgay)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            Is dola:
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.isDoLa)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">
+            Giá vé:
+        </td>
+        <td class="adminData">
+            @Html.EditorFor(model => model.GiaVe)
+        </td>
+    </tr>
+    <tr>
+        <td></td>
+        <td style="text-align:left">
+            <input type="button" id="btnUpdateHanhTrinhGiaVeThoiGian" value="Đồng ý" class="k-button">
+        </td>
+    </tr>
+</table>
+<script>
+
+    $(document).ready(function () {
+
+
+        $('#btnUpdateHanhTrinhGiaVeThoiGian').click(function () {
+            var TuNgay = $("#TuNgay").val();
+            var DenNgay = $("#DenNgay").val();
+            var GiaVe = $("#GiaVe").val();
+            var DiemDiId =$("#DiemDiId").val();
+            var DiemDenId = $("#DiemDenId").val();
+            var IsDoLa = $("#isDoLa").is(':checked');
+            alert(IsDoLa);
+            if(TuNgay==""){
+                alert("Bạn chưa chọn ngày bắt đầu");
+                return;
+            }
+            if(DenNgay==""){
+                alert("Bạn chưa chọn ngày kết thúc");
+                return;
+            }
+            if(GiaVe==""){
+                alert("Bạn chưa chọn giá vé");
+                return;
+            }
+            $.ajax({
+                cache: false,
+                type: "POST",
+                data: {"Id":@Model.Id ,"DiemDiId":DiemDiId,"DiemDenId":DiemDenId,"TuNgay": TuNgay,"DenNgay":DenNgay,"GiaVe":GiaVe,"HanhTrinhId":@Model.HanhTrinhId,"IsDoLa":IsDoLa},
+                dataType: 'json',
+                url: "@(Url.Action("_TabHanhTrinhGiaVeChinhSua", "NhaXes"))",
+                success: function (data) {
+                    if (data == "OK") {
+                        CloseWindowTrinhGiaVeGiaVeChinhSua();
+                    }
+                },
+
+
+            });
+        });
+    });
+</script>

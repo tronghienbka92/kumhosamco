@@ -1,0 +1,21 @@
+﻿@model List<VeXeItem>
+@using Nop.Core.Domain.NhaXes
+<table style="width:100%;border-collapse:collapse;font-style:normal" border="1">
+    <tr style="font-weight:bold">
+       
+        <td>Số seri</td>
+        <td>Số Quyển</td>
+        <td>Ngày Bán</td>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <text>
+            <tr>
+                <td>@item.SoSeri</td>
+                <td>@item.SoQuyen</td>
+                <td>@item.NgayBan.Value.ToString("dd/MM/yyyy")</td>
+    </tr>
+        </text>
+
+    }
+</table>

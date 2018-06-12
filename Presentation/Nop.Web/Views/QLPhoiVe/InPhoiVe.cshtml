@@ -1,0 +1,31 @@
+﻿@model Nop.Web.Models.NhaXes.DanhSachChuyenDiModel.ChuyenDiModel
+@{
+    ViewBag.Title = "InPhoiVe";
+    Layout = "~/Views/Shared/_Print.cshtml";
+}
+
+<div id="sodophoive">
+
+</div>
+<script>
+    $(document).ready(function(){
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            contentType: 'application/html;charset=utf-8',
+            data: { "ChuyenDiId": @Model.ChuyenDiId, "PhanLoai": @Model.PhanLoai},
+            url: "@(Url.Action("_InPhoiVe", "QLPhoiVe"))",
+            success: function (data) {
+                $("#sodophoive").html(data);
+                window.print();
+            },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Error bind data of seat');
+        }
+        });
+        
+    });
+    
+</script>
+

@@ -1,0 +1,58 @@
+﻿@model List<Nop.Web.Models.NhaXes.HanhTrinhGiaVeThoiGianModel>
+
+<table class="adminContent table">
+    <tr>
+        <td class="adminTitle">
+            Điểm đi:
+        </td>
+        <td class="adminTitle">
+            Điểm đến:
+        </td>
+        <td class="adminTitle">
+            Từ ngày:
+        </td>
+        <td class="adminData">
+            Đến ngày:
+        </td>
+        <td>Is Dola</td>
+        <td>
+            Giá vé:
+        </td>
+        <td>
+            Chức năng
+        </td>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="adminTitle">
+                @item.TenDiemDi
+            </td>
+            <td class="adminTitle">
+                @item.TenDiemDen
+            </td>
+            <td class="adminTitle">
+                @item.TuNgay.ToString("dd/MM/yyy")
+            </td>
+            <td class="adminData">
+                @item.DenNgay.ToString("dd/MM/yyy")
+            </td>
+            <td>
+                @item.isDoLa.ToString()
+            </td>
+            <td>
+                @item.GiaVe
+            </td>
+            <td>
+                <a href="javascript:HanhTrinhGiaVeThoiGianChinhSua(@item.Id)">Sửa</a>
+                <a href="javascript:DeleteHanhTrinhGiaVeThoiGian(@item.Id)">Xóa</a>
+            </td>
+        </tr>
+    }
+    
+</table>
+<style>
+    .adminContent td{
+        border:1px solid #dbdbdb;
+    }
+</style>

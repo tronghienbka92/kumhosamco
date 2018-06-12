@@ -1,0 +1,124 @@
+﻿@model Nop.Web.Models.NhaXes.XeXuatBenItemModel
+ @Html.HiddenFor(c=>c.NguonVeId)
+<table style="width:100%">
+    <tr>
+        <td class="adminTitle">
+            Chọn biển số xe:
+        </td>
+        <td class="adminData">
+            <input id="cbb_chuyensodo_bienso" value="@Model.BienSo"  />
+            @Html.HiddenFor(model => model.XeVanChuyenId)
+            @Html.HiddenFor(model => model.BienSo)
+        </td>
+    </tr>
+    <tr>
+        <td class="adminTitle">Chọn sơ đồ ghế:</td>
+        <td class="adminData">
+            @Html.DropDownListFor(m => m.LoaiXeId, Model.loaixes, new { @id = "chuyendi_loaixeid" })
+        </td>
+    </tr>    
+    <tr>
+        <td></td>
+        <td style="text-align:left">
+            <input type="button" id="BtnChuyenSoDo" value="Đồng ý" class="k-button">
+        </td>
+    </tr>
+</table>
+<script>
+
+    $(document).ready(function () {
+
+        
+        $('#BtnChuyenSoDo').click(function () {
+            var XeVanChuyenId = $('#cbb_chuyensodo_bienso').data("kendoComboBox").value();
+            var LoaiXeId= $('#chuyendi_loaixeid').val();
+            $.ajax({
+                cache: false,
+                type: "POST",
+                data: { "ChuyenId": @Model.Id,"XeVanChuyenId":XeVanChuyenId},
+                dataType: 'json',
+                url: "@(Url.Action("ChuyenSoDoghe", "QLPhoiVe"))",
+                success: function (data) {
+                    if (data == "OK") {
+                        $('#@Html.FieldIdFor(model => model.LoaiXeId)').val(LoaiXeId);
+                        CloseWindowChuyenSoDoGhe();
+                    }
+                    
+                    else {
+                        if(data=="XeDaDieu"){
+                            alert("Xe đã được điều chuyến");
+                        }else{
+                            alert(data);
+                        }
+                    }
+
+
+                },
+
+
+            });
+        });
+    });
+    var chuyensododatasoures_bienso = [
+         @for (int i = 0; i < Model.AllXeInfo.Count; i++)
+    {
+        var _item = Model.AllXeInfo[i];
+        <text>
+    {
+        Id: @(_item.Id),
+        BienSo: "@(Html.Raw(HttpUtility.JavaScriptStringEncode(_item.BienSo)))",
+        LoaiXeId: @(_item.LoaiXeId),
+    }
+    </text>
+        if (i != Model.AllXeInfo.Count - 1)
+        {
+            <text>,</text>
+        }
+    }
+    ];
+    ThongTinBienSo();
+    function ThongTinBienSo() {
+        $("#cbb_chuyensodo_bienso").kendoComboBox({
+            placeholder: "Chọn biển số",
+            dataTextField: "BienSo",
+            dataValueField: "Id",
+            filter: "contains",
+            autoBind: true,
+            minLength: 1,
+            dataSource: {
+                data: chuyensododatasoures_bienso
+            },
+            change: function (e) {
+                var DataItem = this.dataItem();
+                $('#chuyendi_loaixeid').val(DataItem.LoaiXeId);
+                $('#@Html.FieldIdFor(model => model.XeVanChuyenId)').val(DataItem.Id);
+                $('#@Html.FieldIdFor(model => model.BienSo)').val(DataItem.BienSo);
+              
+            }
+        });
+    }
+    $("#chuyendi_loaixeid").change(function () {
+        $.ajax({
+            cache: false,
+            type: "GET",
+            dataType: "html",
+            contentType: 'application/html;charset=utf-8',
+            data: {LoaiXeId:$("#chuyendi_loaixeid").val()},
+            url: "@(Url.Action("GetThongTinXeByLoaiXeId", "NhaXes"))",
+            success: function (data) {
+                var listxe=JSON.parse(data);
+                var length=listxe.length;
+                chuyensododatasoures_bienso=[];
+                for(var i=0;i<length;i++){
+                    var item={Id:listxe[i].Id,BienSo:listxe[i].BienSo };
+                    chuyensododatasoures_bienso.push(item);
+                }
+                console.log(chuyensododatasoures_bienso);
+                ThongTinBienSo();
+            },
+        error: function (xhr, ajaxOptions, thrownError) {
+            alert('Chưa đủ thông tin');
+        }
+        });
+    });
+</script>

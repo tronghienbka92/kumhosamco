@@ -1,0 +1,223 @@
+﻿@model BaoCaoNhaXeModel
+@using Nop.Web.Models.NhaXes
+@using Nop.Core.Domain.NhaXes
+@using Nop.Core.Infrastructure
+@{
+    Layout = "~/Views/Shared/_NhaXeLayout.cshtml";
+}
+<div class="section-header">
+    <div class="title">
+        <img src="@Url.Content("~/Content/chonve/nxmenu/baocaodoanhthu.png")" alt="" />
+       Doanh thu hàng hóa theo tuyến
+    </div>
+    <div class="options">
+        <input type="button" id="btnexportdoanhthu" class="k-button" value="Xuất ra excel" />
+
+    </div>
+</div>
+
+<table style="width:100%">
+    <tr>
+        <td align="center" width="15%">
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @Html.LabelFor(model => model.TuNgay):
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.TuNgay)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td align="center" width="15%" id="tabThang">
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @Html.LabelFor(model => model.DenNgay):
+                    </td>
+                    <td class="adminData">
+                        @Html.EditorFor(model => model.DenNgay)
+
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td align="center" width="15%">
+            <table class="adminContent">
+                <tr>
+                    <td class="adminTitle" style="text-align:right">
+                        @T("chonve.menu.nhaxe.hanhtrinh"):
+                    </td>
+                    <td class="adminData">
+                        @Html.DropDownListFor(model => model.Loai2Id, Model.ListLoai2)
+                    </td>
+                </tr>
+            </table>
+        </td>
+        <td style="text-align:right">
+            <input type="button" id="btnSearch" class="k-button" value="@T("Admin.Common.Search")" />
+        </td>
+    </tr>
+</table>
+@using (Html.BeginForm("ExportExcelHangHoaTheoTuyen", "NhaXeBaoCao", FormMethod.Post, new { id = "export-xml-selected-form" }))
+{
+
+
+    <input type="hidden" id="TuNgay" name="TuNgay" value="" />
+    <input type="hidden" id="DenNgay" name="DenNgay" value="" />
+    <input type="hidden" id="HanhTrinhId" name="HanhTrinhId" value="false" />
+}
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('#btnexportdoanhthu').click(function () {           
+           
+            var hanhtrinhid= $("#@Html.FieldIdFor(model => model.Loai2Id)").val();
+            var tungay= $("#@Html.FieldIdFor(model => model.TuNgay)").val();
+            var denngay= $("#@Html.FieldIdFor(model => model.DenNgay)").val();
+
+
+            $('#export-xml-selected-form #TuNgay').val(tungay);
+            $('#export-xml-selected-form #DenNgay').val(denngay);
+            $('#export-xml-selected-form #HanhTrinhId').val(hanhtrinhid);
+
+            $('#export-xml-selected-form').submit();
+            return false;
+        });
+    });
+
+</script>
+<script>
+    $(document).ready(function () {
+        $('#btnSearch').click(function () {
+            //search
+            var grid = $('#danhsach-grid').data('kendoGrid');
+            grid.dataSource.read();
+           // return false;
+        });
+    });
+    $("#@Html.FieldIdFor(model => model.Loai2Id)").change(function () {
+        $("#btnSearch").click();
+    });
+
+</script>
+
+<table class="adminContent">
+    <tr>
+        <td>
+            <div id="danhsach-grid"></div>
+
+            <script>
+    $(document).ready(function () {
+        $("#danhsach-grid").kendoGrid({
+            dataSource: {
+                type: "json",
+                transport: {
+                    read: {
+                        url: "@Html.Raw(Url.Action("HangHoaTheoTuyen", "NhaXeBaoCao"))",
+                                    type: "POST",
+                                    dataType: "json",
+                                    data: additionalData
+                                }
+                            },
+                            schema: {
+                                data: "Data",
+                                total: "Total",
+                                errors: "Errors"
+                            },
+                            error: function(e) {
+                                display_kendoui_grid_error(e);
+                                // Cancel the changes
+                                this.cancelChanges();
+                            },
+                            serverPaging: false,
+                            serverFiltering: false,
+                            serverSorting: false
+                        },
+                        scrollable: false,
+                        columns: [{
+                            field: "STT",
+                            title: "STT"
+                        }, {
+                            field: "Tuyen",
+                            title: "Tuyến"
+                        }, {
+                            field: "BienSoXe",
+                            title: "Biển số xe"
+                        }, {
+                            field: "MaPhieuGui",
+                            title: "Mã phiếu"
+                        }, {
+                            field: "NgayDi",
+                            title: "Ngày đi",
+                            type: "date",
+                            format: "{0:dd/MM/yyyy}"
+                        },  {
+                            field: "TenHang",
+                            title: "Tên hàng"
+                        }, {
+                            field: "SoLuong",
+                            title: "Số lượng"
+                        }, {
+                            field: "DonGia",
+                            title: "Đơn giá"
+                        }, {
+                            field: "ThanhTien",
+                            title: "Thành tiền"
+                        },
+                  {
+                      field: "TenLaiXe",
+                      title: "Lái xe"
+                  }, {
+                      field: "TenNTV",
+                      title: "Tiếp viên"
+                  },
+                        ]
+                    });
+                });
+
+                function additionalData() {
+                    return {
+                        HanhTrinhId: $("#@Html.FieldIdFor(model => model.Loai2Id)").val(),
+            tuNgay: $("#@Html.FieldIdFor(model => model.TuNgay)").val(),
+            denNgay: $("#@Html.FieldIdFor(model => model.DenNgay)").val(),
+        };
+    }
+
+            </script>
+
+        </td>
+    </tr>
+</table>
+
+<div id="divChiTietLuotDi" style="display:none;">
+
+</div>
+<script>
+    function convert(ngayban) {
+
+        var date = new Date(ngayban);
+        mnth = ("0" + (date.getMonth() + 1)).slice(-2);
+        day = ("0" + date.getDate()).slice(-2);
+        return [date.getFullYear(), mnth, day].join("-");
+    }
+    function viewdetail(SoQuyen,NgayBan) {
+        var _NgayBan = convert(NgayBan);
+        var HanhTrinhId = $("#@Html.FieldIdFor(model => model.Loai2Id)").val();
+
+        var windowDoanhThuXe = $("#divChiTietLuotDi");
+        if (windowDoanhThuXe.data("kendoWindow"))
+            windowDoanhThuXe.data("kendoWindow").destroy();
+        windowDoanhThuXe.kendoWindow({
+            modal: true,
+            width: "600px",
+            height:"400px",
+            title: "Chi tiết doanh thu ngày" + _NgayBan,
+            content: "@(Url.Action("_ChiTietDoanhThuHanhTrinhVeQuay", "NhaXeBaoCao"))" + "?HanhTrinhId=" + HanhTrinhId + "&NgayBan=" + _NgayBan + "&SoQuyen=" + SoQuyen,
+            actions: ["Close"]
+        });
+        windowDoanhThuXe.data('kendoWindow').center().open();
+    }
+</script>

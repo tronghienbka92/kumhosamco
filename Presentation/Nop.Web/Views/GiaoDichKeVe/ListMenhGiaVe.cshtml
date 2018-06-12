@@ -1,0 +1,96 @@
+﻿@{
+    Layout = "~/Views/Shared/_NhaXeLayout.cshtml";
+
+}
+
+<div id="grid-menhgia"></div>
+
+<script>
+    var indexrow1 = 0;
+    $(document).ready(function () {
+
+        $("#grid-menhgia").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: {
+                        url: "/GiaoDichKeVe/GridMenhGiaVe",
+                        dataType: "jsonp"
+                    },
+                    update: {
+                        url: "/GiaoDichKeVe/EditMenhGiaVe",
+                        dataType: "jsonp"
+                    },
+
+                    create: {
+                        url: "/GiaoDichKeVe/CreateMenhGiaVe",
+                        dataType: "jsonp"
+                    },
+                    destroy: {
+                        url: "/GiaoDichKeVe/DeleteMenhGiaVe",
+                        datatype: "jsonp"
+                    },
+                    parameterMap: function (options, operation) {
+                        indexrow1 = 0;
+                        if (operation !== "read" && options.models) {
+                            return { models: kendo.stringify(options.models) };
+                        }
+                    }
+                },
+                batch: true,
+                schema: {
+                    model: {
+                        id: "Id",
+                        fields: {
+                            Id: { type: "number", editable: false, nullable: false },
+                            GiaVe: { type: "number", validation: { required: false }, editable: false },
+                            isShow: { type: "boolean", validation: { required: false }, editable: true }
+
+                        }
+                    }
+                },
+                requestEnd: function (e) {
+                    if (e.type == "create" || e.type == "update" || e.type == "destroy") {
+                        this.read();
+                    }
+                },
+            },
+            pageable: false,
+            height: 300,
+            toolbar: [{ name: "create", text: "Thêm mới" }],
+            columns: [
+
+               {
+                   title: "STT",
+                   template: "#= ++indexrow1 #",
+                   width: 50,
+                   attributes: { style: "text-align:center" },
+               },
+
+                {
+                    field: "MenhGia", title: "Mệnh giá",
+                    type: "number",
+                    format: "{0:###,###,##0 }"
+                },
+                {
+                    field: "isShow", 
+                    title: "is hiển thị",
+                    width: 200,
+                    headerAttributes: { style: "text-align:center" },
+                    attributes: { style: "text-align:center" },
+                    template: '<img src="@Url.Content("~/Administration/Content/images/")active-#=isShow#.gif" />'
+                },
+                {
+                    command: [
+                        { name: "edit", text: "Sửa"},
+                        { name: "delete", text: "Xóa" }
+                    ], title: "&nbsp;"
+                }],
+                editable: {
+                confirmation: "Bạn có chắc chắn xóa thông tin giá vé này không ?",
+                mode: "inline"
+                },
+
+        });
+    });
+    
+</script>
